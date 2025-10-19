@@ -2,6 +2,7 @@ import { Router } from 'express';
 const router = Router();
 
 import authRoute from './authRoute';
+import userRoutes from './userRoutes';
 
 router.get('/healthCheck', (req, res) => {
   const now = new Date();
@@ -14,5 +15,7 @@ router.get('/healthCheck', (req, res) => {
 });
 
 router.use('/auth', authRoute);
+
+router.use('/user', userRoutes);
 
 export default router;

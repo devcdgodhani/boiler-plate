@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongoose';
-import { GENDER, SIGN_UP_TYPE, USER_TYPE } from '../constants';
+import { GENDER, SIGN_UP_TYPE, USER_STATUS, USER_TYPE } from '../constants';
 import { IDefaultAttributes } from './common';
 
 export interface IUserAttributes extends IDefaultAttributes {
@@ -17,6 +17,7 @@ export interface IUserAttributes extends IDefaultAttributes {
   isEmailVerified: boolean;
   signUpType?: SIGN_UP_TYPE;
   isVerified: boolean;
+  status: USER_STATUS;
 }
 
 export interface IUserDocument extends Omit<IUserAttributes, 'id'>, Document {}

@@ -1,31 +1,31 @@
 import { Schema, model } from 'mongoose';
 import { IUserDocument } from '../../../interfaces';
-import { USER_TYPE, GENDER, SIGN_UP_TYPE } from '../../../constants';
+import { USER_TYPE, GENDER, SIGN_UP_TYPE, USER_STATUS } from '../../../constants';
 
-const UserSchema = new Schema<IUserDocument>(
+export const UserSchema = new Schema<IUserDocument>(
   {
     firstName: {
       type: String,
-      required: true,
+      required: false,
       maxLength: 50,
       trim: true,
     },
     lastName: {
       type: String,
-      required: true,
+      required: false,
       maxLength: 50,
       trim: true,
     },
     username: {
       type: String,
-      required: true,
+      required: false,
       unique: true,
       index: true,
       trim: true,
     },
     password: {
       type: String,
-      required: true,
+      required: false,
     },
     mobile: {
       type: String,
@@ -46,12 +46,12 @@ const UserSchema = new Schema<IUserDocument>(
     type: {
       type: String,
       enum: Object.values(USER_TYPE),
-      required: true,
+      required: false,
     },
     gender: {
       type: String,
       enum: Object.values(GENDER),
-      required: true,
+      required: false,
     },
     signUpType: {
       type: String,
@@ -71,9 +71,14 @@ const UserSchema = new Schema<IUserDocument>(
       type: Boolean,
       default: false,
     },
+    status: {
+      type: String,
+      enum: Object.values(USER_STATUS),
+      default: USER_STATUS.ACTIVE,
+    },
   },
   {
-    timestamps: true, // adds createdAt and updatedAt
+    timestamps: true,
     versionKey: false,
   }
 );

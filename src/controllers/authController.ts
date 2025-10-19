@@ -246,7 +246,7 @@ export default class AuthController {
           AUTH_ERROR_MESSAGES.INVALID_PASSWORD
         );
       }
-      const newPassword = this.authService.generateHashPassword(bodyData.newPassword);
+      const newPassword = await this.authService.generateHashPassword(bodyData.newPassword);
       await this.userService.updateOne(
         { id: user.id },
         { password: newPassword },
@@ -383,7 +383,7 @@ export default class AuthController {
     try {
       const reqData = req.body;
 
-      const newPassword = this.authService.generateHashPassword(reqData.password);
+      const newPassword = await this.authService.generateHashPassword(reqData.newPassword);
       await this.userService.updateOne(
         { id: req.user.id },
         { password: newPassword },
@@ -394,6 +394,21 @@ export default class AuthController {
         status: HTTP_STATUS_CODE.OK.STATUS,
         code: HTTP_STATUS_CODE.OK.CODE,
         message: USER_SUCCESS_MESSAGES.PASSWORD_UPDATED,
+      };
+
+      return res.status(response.status).json(response);
+    } catch (err) {
+      return next(err);
+    }
+  };
+
+  getLoggedInUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const response: IApiResponse<IUserAttributes> = {
+        status: HTTP_STATUS_CODE.OK.STATUS,
+        code: HTTP_STATUS_CODE.OK.CODE,
+        message: USER_SUCCESS_MESSAGES.PASSWORD_UPDATED,
+        data: req.user,
       };
 
       return res.status(response.status).json(response);

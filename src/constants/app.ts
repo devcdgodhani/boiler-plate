@@ -3,7 +3,7 @@ import { TOKEN_TYPE } from './common';
 import path from 'path';
 
 export const AUTH_TOKEN_EXPIRATION_IN_MINUTES: Record<TOKEN_TYPE, number> = {
-  [TOKEN_TYPE.ACCESS_TOKEN]: 5,
+  [TOKEN_TYPE.ACCESS_TOKEN]: 60 * 24 * 365,
   [TOKEN_TYPE.REFRESH_TOKEN]: 60 * 24 * 365,
   [TOKEN_TYPE.OTP_TOKEN]: 5,
   [TOKEN_TYPE.FORGET_PASSWORD_TOKEN]: 5,
