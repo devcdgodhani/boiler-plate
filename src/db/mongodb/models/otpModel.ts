@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { OTP_TYPE } from '../../../constants';
 import { IOtpDocument } from '../../../interfaces';
+import { defaultAttributes } from '../plugins/baseSchema';
 
 // Schema
 const OtpSchema = new Schema<IOtpDocument>(
@@ -12,6 +13,7 @@ const OtpSchema = new Schema<IOtpDocument>(
     expiredAt: { type: Number, required: false },
     maxUses: { type: Number, required: false, default: 1 },
     usesCount: { type: Number, required: false, default: 0 },
+    ...defaultAttributes,
   },
   {
     timestamps: true,

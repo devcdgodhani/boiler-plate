@@ -18,3 +18,17 @@ export enum AUTH_SUCCESS_MESSAGES {
   LOGGED_IN_SUCCESS = 'Logged in successfully',
   LOG_OUT_SUCCESS = 'Logout successfully',
 }
+
+export enum CATEGORY_SUCCESS_MESSAGES {
+  CREATE_SUCCESS = 'Category created successfully',
+  GET_SUCCESS = 'Category details retrieved successfully',
+  UPDATE_SUCCESS = 'Category details updated successfully',
+  DELETE_SUCCESS = 'Category deleted successfully',
+}
+
+export enum SUB_CATEGORY_SUCCESS_MESSAGES {
+  CREATE_SUCCESS = 'Sub category created successfully',
+  GET_SUCCESS = 'Sub category details retrieved successfully',
+  UPDATE_SUCCESS = 'Sub category details updated successfully',
+  DELETE_SUCCESS = 'Sub category deleted successfully',
+}

@@ -1,8 +1,11 @@
 import { Router } from 'express';
 const router = Router();
 
+import { jwtAuth } from '../../../middlewares';
 import authRoute from './authRoute';
 import userRoutes from './userRoutes';
+import categoryRoutes from './categoryRoutes';
+import subCategoryRoutes from './subCategoryRoutes';
 
 router.get('/healthCheck', (req, res) => {
   const now = new Date();
@@ -16,6 +19,10 @@ router.get('/healthCheck', (req, res) => {
 
 router.use('/auth', authRoute);
 
-router.use('/user', userRoutes);
+router.use('/user', jwtAuth(), userRoutes);
+
+router.use('/category', jwtAuth(), categoryRoutes);
+
+router.use('/subCategory', jwtAuth(), subCategoryRoutes);
 
 export default router;

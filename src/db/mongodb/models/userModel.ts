@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { IUserDocument } from '../../../interfaces';
 import { USER_TYPE, GENDER, SIGN_UP_TYPE, USER_STATUS } from '../../../constants';
+import { defaultAttributes } from '../plugins/baseSchema';
 
 export const UserSchema = new Schema<IUserDocument>(
   {
@@ -76,6 +77,7 @@ export const UserSchema = new Schema<IUserDocument>(
       enum: Object.values(USER_STATUS),
       default: USER_STATUS.ACTIVE,
     },
+    ...defaultAttributes,
   },
   {
     timestamps: true,

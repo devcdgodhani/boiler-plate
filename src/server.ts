@@ -4,7 +4,7 @@ import indexRoutes from './routes/api/v1';
 import path from 'path';
 import cors from 'cors';
 import { ENV_VARIABLE } from './configs';
-import { apiRateLimit, errorConverter, errorHandler } from './middlewares';
+import { apiLogger, apiRateLimit, errorConverter, errorHandler } from './middlewares';
 
 const app = express();
 // Enable trust proxy
@@ -19,6 +19,8 @@ app.use(compression());
 
 //  limit repeated requests to public APIs
 app.use(apiRateLimit);
+
+app.use(apiLogger);
 
 // Serve static files from the 'public' directory
 app.use('/public', express.static(path.join(process.cwd(), 'public')));

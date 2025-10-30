@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { IAuthTokenDocument } from '../../../interfaces';
 import { TOKEN_TYPE } from '../../../constants';
+import { defaultAttributes } from '../plugins/baseSchema';
 
 // Schema
 const AuthTokenSchema = new Schema<IAuthTokenDocument>(
@@ -10,6 +11,7 @@ const AuthTokenSchema = new Schema<IAuthTokenDocument>(
     userId: { type: Schema.Types.ObjectId, ref: 'users', required: false },
     expiredAt: { type: Number, required: false },
     referenceTokenId: { type: Schema.Types.ObjectId, ref: 'aut_tokens', required: false },
+    ...defaultAttributes,
   },
   {
     timestamps: true,

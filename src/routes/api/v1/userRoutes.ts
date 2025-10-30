@@ -1,44 +1,38 @@
 import { Router } from 'express';
-import UserController from '../../../controllers/UserController';
-import UserValidator from '../../../validations/userValidators';
+import UserController from '../../../controllers/userController';
+import UserValidator from '../../../validators/userValidators';
 
 const router = Router();
 const userController = new UserController();
 const userValidator = new UserValidator();
 
-/***********Fetch users api ************/
+/*********** Fetch users api ************/
 router.get('/getOne', userValidator.getOne, userController.getOne);
+router.get('/getAll', userValidator.getAll, userController.getAll);
+router.get('/getWithPagination', userValidator.getWithPagination, userController.getWithPagination);
 
-router.get('/getAll', userController.getAll);
+router.post('/getOne', userValidator.getOne, userController.getOne);
+router.post('/getAll', userValidator.getAll, userController.getAll);
+router.post(
+  '/getWithPagination',
+  userValidator.getWithPagination,
+  userController.getWithPagination
+);
 
-router.get('/getById', userController.getById);
+/*********** Update users api ************/
+router.put('/bulkUpdate', userValidator.updateByFilter, userController.updateManyByFilter);
+router.put('/updateOneByFilter', userValidator.updateByFilter, userController.updateOneByFilter);
+router.put(
+  '/updateManyByFilter',
+  userValidator.updateManyByFilter,
+  userController.updateManyByFilter
+);
 
-router.get('/getWithPagination', userController.getWithPagination);
+/*********** Create users api ************/
+router.post('/bulkCreate', userValidator.bulkCreate, userController.create);
+router.post('/', userValidator.create, userController.create);
 
-router.post('/getOne', userController.getOne);
-
-router.post('/getAll', userController.getAll);
-
-router.post('/getById', userController.getById);
-
-router.post('/getWithPagination', userController.getWithPagination);
-
-/***********Update users api ************/
-
-router.put('/bulkUpdate', userController.updateManyByFilter);
-
-router.put('/updateOneByFilter', userController.updateOneByFilter);
-
-router.put('/updateManyByFilter', userController.updateManyByFilter);
-
-/***********Create users api ************/
-
-router.post('/bulkCreate', userController.create);
-
-router.post('/', userController.create);
-
-/***********Delete users api ************/
-
-router.delete('/deleteByFilter', userController.deleteByFilter);
+/*********** Delete users api ************/
+router.delete('/deleteByFilter', userValidator.deleteByFilter, userController.deleteByFilter);
 
 export default router;

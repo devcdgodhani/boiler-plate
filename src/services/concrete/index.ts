@@ -5,3 +5,5 @@ export * from './authTokenService';
 export * from './mongooseCommonService';
 export * from './otpService';
 export * from './userService';
+export * from './categoryService';
+export * from './subCategoryService';

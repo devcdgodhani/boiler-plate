@@ -1,6 +1,7 @@
-import { Schema, model, } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { IAuthActionHistoryDocument } from '../../../interfaces';
 import { AUTH_ACTION_TYPE } from '../../../constants';
+import { defaultAttributes } from '../plugins/baseSchema';
 
 // Schema
 const AuthActionHistorySchema = new Schema<IAuthActionHistoryDocument>(
@@ -10,15 +11,16 @@ const AuthActionHistorySchema = new Schema<IAuthActionHistoryDocument>(
     actionAt: { type: Number, required: false },
     deviceId: { type: String, required: false },
     deviceIp: { type: Boolean, required: false },
+    ...defaultAttributes,
   },
   {
     timestamps: true,
     versionKey: false,
-  },
+  }
 );
 
 // Model
 export const AuthActionHistoryModel = model<IAuthActionHistoryDocument>(
   'auth_action_histories',
-  AuthActionHistorySchema,
+  AuthActionHistorySchema
 );

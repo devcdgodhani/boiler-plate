@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose, { Schema } from 'mongoose';
 import Joi, { NumberSchema, StringSchema, Schema as JoiSchema, AlternativesSchema } from 'joi';
+import { ApiError } from './apiError';
+import { HTTP_STATUS_CODE } from '../constants';
+import { isValidMongoDbId } from './utils';
 
 /* ---------------------- Types ---------------------- */
 
@@ -82,7 +85,7 @@ export interface MongooseToJoiOptions<T extends PlainObject = PlainObject> {
   includeFields?: NestedPaths<T>[]; // autocomplete for top + nested fields up to D
   excludeFields?: NestedPaths<T>[];
   requiredFields?: NestedPaths<T>[];
-  singleOrMultiple?: boolean | 'single' | 'multiple' | 'both';
+  isFilterSchema?: boolean | 'single' | 'multiple' | 'both';
 }
 
 /* ---------------------- Helpers ---------------------- */
@@ -109,17 +112,17 @@ const isPathIncluded = (path: string, includeFields?: string[], excludeFields?: 
 
 /* ---------------------- Core Converter ---------------------- */
 
-const convertField = (fieldDef: MongooseField, singleOrMultiple: boolean): JoiSchema => {
+const convertField = (fieldDef: MongooseField, isFilterSchema: boolean): JoiSchema => {
   // Arrays
   if (Array.isArray(fieldDef)) {
     const arrayItem = fieldDef[0];
-    return Joi.array().items(arrayItem ? convertField(arrayItem, singleOrMultiple) : Joi.any());
+    return Joi.array().items(arrayItem ? convertField(arrayItem, isFilterSchema) : Joi.any());
   }
 
   // Nested Schema
   if (fieldDef instanceof mongoose.Schema) {
     // recursion into nested mongoose.Schema
-    return mongooseToJoiInternal(fieldDef, { singleOrMultiple }).joiObj as unknown as JoiSchema;
+    return mongooseToJoiInternal(fieldDef, { isFilterSchema }).joiObj as unknown as JoiSchema;
   }
 
   // { type: Schema }
@@ -129,7 +132,7 @@ const convertField = (fieldDef: MongooseField, singleOrMultiple: boolean): JoiSc
     'type' in fieldDef &&
     (fieldDef as Record<string, unknown>).type instanceof mongoose.Schema
   ) {
-    return mongooseToJoiInternal((fieldDef as Record<string, any>).type, { singleOrMultiple })
+    return mongooseToJoiInternal((fieldDef as Record<string, any>).type, { isFilterSchema })
       .joiObj as unknown as JoiSchema;
   }
 
@@ -137,7 +140,7 @@ const convertField = (fieldDef: MongooseField, singleOrMultiple: boolean): JoiSc
   if (typeof fieldDef === 'object' && fieldDef !== null && !('type' in fieldDef)) {
     const nested: Record<string, JoiSchema> = {};
     for (const [key, val] of Object.entries(fieldDef)) {
-      nested[key] = convertField(val as MongooseField, singleOrMultiple);
+      nested[key] = convertField(val as MongooseField, isFilterSchema);
     }
     return Joi.object(nested);
   }
@@ -148,7 +151,7 @@ const convertField = (fieldDef: MongooseField, singleOrMultiple: boolean): JoiSc
     fieldDef !== null &&
     typeof (fieldDef as Record<string, unknown>).type === 'object'
   ) {
-    return convertField((fieldDef as Record<string, MongooseField>).type, singleOrMultiple);
+    return convertField((fieldDef as Record<string, MongooseField>).type, isFilterSchema);
   }
 
   // Primitives and options
@@ -196,8 +199,20 @@ const convertField = (fieldDef: MongooseField, singleOrMultiple: boolean): JoiSc
 
   if (options.default !== undefined) rule = (rule as any).default(options.default);
 
-  if (singleOrMultiple) {
+  if (isFilterSchema) {
     rule = Joi.alternatives().try(rule, Joi.array().items(rule)) as AlternativesSchema;
+    if (type === Number || type === Date) {
+      rule = Joi.alternatives().try(
+        rule,
+        Joi.array().items(rule),
+        Joi.object({
+          from: rule,
+          to: rule,
+          lt: rule,
+          gt: rule,
+        })
+      );
+    }
   }
 
   return rule;
@@ -217,11 +232,14 @@ const mongooseToJoiInternal = <T extends PlainObject>(
     includeFields,
     excludeFields,
     requiredFields,
-    singleOrMultiple = false,
+    isFilterSchema = false,
     parentPath = '',
   }: Omit<MongooseToJoiOptions<T>, 'schema'> & { parentPath?: string } = {}
 ) => {
-  const joiObj: Record<string, JoiSchema> = {};
+  const joiObj: Record<string, JoiSchema> = {
+    id: Joi.alternatives().try(isValidMongoDbId, Joi.array().items(isValidMongoDbId)),
+    search: Joi.string().trim(),
+  };
   const allFields = Object.keys((schema as any).obj || {});
 
   const included: string[] = [];
@@ -240,7 +258,7 @@ const mongooseToJoiInternal = <T extends PlainObject>(
       continue;
 
     const field = (schema as any).obj[key] as MongooseField;
-    const rule = convertField(field, Boolean(singleOrMultiple));
+    const rule = convertField(field, Boolean(isFilterSchema));
 
     // Set in nested joiObj using helper
     setNested(
@@ -317,10 +335,53 @@ export interface IUserDocument extends Omit<IUserAttributes, 'id'>, Document {}
 //   schema,
 //   includeFields: ['firstName', 'profile', 'profile.social', 'profile.social.profile.bio'],
 //   requiredFields: ['firstName', 'profile.social.profile.bio'],
-//   singleOrMultiple: true,
+//   isFilterSchema: true,
 // });
 // const joiObject = result.joiObj;
 // console.log(result.includedFields, result.requiredFields);
 */
 
-export default mongooseToJoi;
+export const validateSchema = (
+  schema: {
+    [x: string]: Joi.Schema;
+  },
+  data: Record<string, any>,
+  options = {
+    abortEarly: false, // include all errors
+    allowUnknown: false, // ignore unknown props
+    // stripUnknown: true, // remove unknown props
+  }
+) => {
+  if (data.isPaginate) {
+    schema = {
+      ...schema,
+      page: Joi.number().min(1).default(1),
+      isPaginate: Joi.boolean(),
+      limit: Joi.number().min(1).default(10),
+      order: Joi.object().pattern(
+        Joi.string().trim(), // field name
+        Joi.number().valid(1, -1) // sorting direction
+      ),
+    };
+  }
+  const validSchema = Joi.object(schema);
+
+  const { error, value: validData } = validSchema.validate(data, options);
+
+  if (error) {
+    const errorMessage = error.details
+      .map((detail) => {
+        if (detail.context?.message) {
+          return `${detail.message}${detail.context.message}`;
+        }
+        return detail.message;
+      })
+      .join(', ');
+    throw new ApiError(
+      HTTP_STATUS_CODE.BAD_REQUEST.CODE,
+      HTTP_STATUS_CODE.BAD_REQUEST.STATUS,
+      errorMessage
+    );
+  }
+  return validData;
+};

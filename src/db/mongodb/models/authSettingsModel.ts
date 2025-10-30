@@ -5,6 +5,7 @@ import {
   AUTH_SETTINGS_ALLOW_SIGN_UP_FOR,
   AUTH_SETTINGS_TYPE,
 } from '../../../constants';
+import { defaultAttributes } from '../plugins/baseSchema';
 
 // Schema
 const AuthSettingsSchema = new Schema<IAuthSettingsDocument>(
@@ -26,6 +27,7 @@ const AuthSettingsSchema = new Schema<IAuthSettingsDocument>(
       enum: Object.values(AUTH_SETTINGS_TYPE),
       required: false,
     },
+    ...defaultAttributes,
   },
   {
     timestamps: true,

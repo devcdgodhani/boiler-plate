@@ -13,6 +13,7 @@ yarn.lock
 
 # Logs
 npm-debug.log*
+logs
 
 #env
 .env

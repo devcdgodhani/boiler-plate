@@ -1,3 +1,5 @@
+import { ObjectId } from "mongoose";
+
 export interface IApiResponse<T = undefined> {
   code: string;
   status: number;
@@ -7,7 +9,7 @@ export interface IApiResponse<T = undefined> {
 }
 export interface IPaginationApiResponse<T> {
   code: string;
-  status: boolean;
+  status: number;
   message: string;
   data?: IPaginationData<T>;
   error?: string | [] | object;
@@ -26,9 +28,9 @@ export interface IDefaultAttributes {
   createdAt?: Date;
   updatedAt?: Date;
   deletedAt?: Date;
-  createdBy?: Date;
-  updatedBy?: Date;
-  deletedBy?: Date;
+  createdBy?: ObjectId;
+  updatedBy?: ObjectId;
+  deletedBy?: ObjectId;
 }
 
 export interface IEnvVariables {

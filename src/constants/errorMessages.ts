@@ -25,3 +25,21 @@ export enum AUTH_ERROR_MESSAGES {
 export enum OTP_ERROR_MESSAGES {
   INVALID_OTP = 'Invalid otp!',
 }
+
+export enum CATEGORY_ERROR_MESSAGES {
+  CREATE_FAIL = 'Unable to create category!',
+  GET_FAIL = 'Unable to retrieve category details!',
+  UPDATE_FAIL = 'Unable to update category details!',
+  DELETE_FAIL = 'Unable to delete category details!',
+  NOT_FOUND = 'Unable to find category details!',
+  EXIST = 'Category is already exist!',
+}
+
+export enum SUB_CATEGORY_ERROR_MESSAGES {
+  CREATE_FAIL = 'Unable to create sub category!',
+  GET_FAIL = 'Unable to retrieve sub category details!',
+  UPDATE_FAIL = 'Unable to update sub category details!',
+  DELETE_FAIL = 'Unable to delete sub category details!',
+  NOT_FOUND = 'Unable to find sub category details!',
+  EXIST = 'Sub category is already exist!',
+}

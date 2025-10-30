@@ -5,3 +5,5 @@ export * from './authTokenServiceInterface';
 export * from './mongooseCommonServiceInterface';
 export * from './otpServiceInterface';
 export * from './userServiceInterface';
+export * from './categoryServiceInterface';
+export * from './subCategoryServiceInterface';

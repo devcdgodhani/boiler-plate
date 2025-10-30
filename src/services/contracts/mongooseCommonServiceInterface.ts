@@ -14,6 +14,12 @@ import {
 import { IPaginationData } from '../../interfaces';
 
 export interface IReadService<T> {
+  generateFilter(options: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    filters?: Record<string, any>;
+    searchFields?: (keyof T)[];
+  }): FilterQuery<T>;
+
   findAll(
     filter: FilterQuery<T>,
     options?: QueryOptions,

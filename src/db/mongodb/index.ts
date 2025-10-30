@@ -26,3 +26,5 @@ export * from './models/authSettingsModel';
 export * from './models/authTokenModel';
 export * from './models/otpModel';
 export * from './models/userModel';
+export * from './models/categoryModel';
+export * from './models/subCategoryModel';
